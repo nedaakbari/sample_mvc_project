@@ -35,7 +35,7 @@ public class SecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder()
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
@@ -48,8 +48,22 @@ public class SecurityConfiguration {
                 .formLogin(withDefaults());
         return http.build();
     }
+    //                        (authorize) -> authorize.requestMatchers("/employee").authenticated()
+    //                        .anyRequest().permitAll()
 
 
+
+    //protected void configure(HttpSecurity http) throws Exception {
+    //http
+    //.authorizeRequests()
+    //.antMatchers("/spitters/me").authenticated()
+    //.antMatchers(HttpMethod.POST, "/spittles").hasAuthority("ROLE_SPITTER").authenticated()
+    //.antMatchers(HttpMethod.POST, "/spittles").hasRole("SPITTER")
+    //.antMatchers("/spitter/me").access("hasRole('ROLE_SPITTER')")
+    //.anyRequest().permitAll();
+
+//    .antMatchers("/spitters/**").authenticated();
+//    .antMatchers("/spitters/**", "/spittles/mine").authenticated();
 /*
     //1=> Working with an in-memory user store
     @Bean

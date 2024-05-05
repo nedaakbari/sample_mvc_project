@@ -16,6 +16,7 @@ import java.util.ArrayList;
 @Service
 @RequiredArgsConstructor
 public class EmployeeService implements UserDetailsService {
+    //The userDetailsService() method (like jdbcAuthentication(), ldapAuthentication, and inMemoryAuthentication()) configures a configuration store
     private final EmployeeRepository employeeRepository;
 
     @Override
