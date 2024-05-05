@@ -3,6 +3,10 @@ package org.example.sample.config;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
 // you can configure DelegatingFilterProxy in web.xml or by subclassing AbstractSecurityWebApplicationInitializer
+
+//spring Security provides a base class AbstractSecurityWebApplicationInitializer that will ensure the
+// springSecurityFilterChain gets registered for every URL in the application
+
 //springSecurityFilterChain   FilterChainProxy
 public class SecurityWebApplicationInitializer extends AbstractSecurityWebApplicationInitializer {
 

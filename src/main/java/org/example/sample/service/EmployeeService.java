@@ -2,33 +2,35 @@ package org.example.sample.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.sample.model.Employee;
+import org.example.sample.model.Users;
 import org.example.sample.repository.EmployeeRepository;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.example.sample.repository.UsersRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.net.FileNameMap;
 
 @Service
 @RequiredArgsConstructor
-public class EmployeeService implements UserDetailsService {
-    //The userDetailsService() method (like jdbcAuthentication(), ldapAuthentication, and inMemoryAuthentication()) configures a configuration store
+public class EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UsersRepository usersRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var employee = employeeRepository.findByUsername(username);
-        if (employee.isPresent()) {
-            var authorities = new ArrayList<GrantedAuthority>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
-            var presentEmployee = employee.get();
+    public void register() {
+        var users = new Users();
+        users.setEnabled(true);
+        users.setPassword(passwordEncoder.encode("123"));
+        users.setUsername("neda");
+        Users save = usersRepository.save(users);
 
-            return new User(presentEmployee.getUsername(), presentEmployee.getPassword(), authorities);
-        }
-        throw new UsernameNotFoundException("User '" + username + "' not found.");
+        Employee employee = new Employee();
+        employee.setUsers(save);
+        employee.setEmployeeID("256");
+        employee.setLastName("akbari");
+        employee.setFirstName("neda");
+        employee.setNationalCode("25602555");
+
+        employeeRepository.save(employee);
     }
 }

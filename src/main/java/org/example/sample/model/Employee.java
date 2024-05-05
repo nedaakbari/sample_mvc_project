@@ -17,8 +17,9 @@ public class Employee {
     private Long id;
     private String firstName;
     private String lastName;
-    private String username;
-    private String password;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private Users users;
     @Column(unique = true, nullable = false)
     private String nationalCode;
     private String employeeID;

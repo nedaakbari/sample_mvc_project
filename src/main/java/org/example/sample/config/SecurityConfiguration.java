@@ -2,25 +2,17 @@ package org.example.sample.config;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.sample.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.sample.service.UsersService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -31,7 +23,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfiguration {
 
     private final DataSource dataSource;
-    private final EmployeeService employeeService;
+    private final UsersService usersService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,17 +32,55 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {//how HTTP requests should be secured and what options a client has for authenticating the user
-        http.userDetailsService(employeeService)
-                .authorizeHttpRequests((authorize) -> authorize
-                        .anyRequest().authenticated()
+//        http
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(withDefaults())
+//                .httpBasic(withDefaults());
+//        return http.build();
+        /////////////////////////////////////////////////////////////////////
+        http
+                .userDetailsService(usersService)
+                .authorizeHttpRequests(
+                        authorize -> authorize.anyRequest().authenticated()
+                        //authorize -> authorize.requestMatchers(HttpMethod.POST, "/employee/register").permitAll()//todo not working
+//                        authorize -> authorize.requestMatchers(HttpMethod.POST, "/employee/register").permitAll()
+                        //authorize.requestMatchers("/employee").authenticated()
                 )
                 .httpBasic(withDefaults())
+//                .formLogin(form -> form.loginPage("/login").permitAll());
                 .formLogin(withDefaults());
+
         return http.build();
+
+        /////////////////////////////////////////////////////////////////////
+//        http
+//                .securityMatcher("/api/**")
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .anyRequest().hasRole("ADMIN"))
+//                .httpBasic(withDefaults());
+//        return http.build();
+        /////////////////////////////////////////////////////////////////////
+//        http
+//                .formLogin()
+//                .loginPage("/login.html")
+//                .loginProcessingUrl("/perform_login")
+//                .defaultSuccessUrl("/homepage.html", true)
+//                .failureUrl("/login.html?error=true")
+//                .failureHandler(authenticationFailureHandler())
+//                .and()
+//                .logout()
+//                .logoutUrl("/perform_logout")
+//                .deleteCookies("JSESSIONID")
+//                .logoutSuccessHandler(logoutSuccessHandler());
+//
+//        return http.build();
     }
+
+
     //                        (authorize) -> authorize.requestMatchers("/employee").authenticated()
     //                        .anyRequest().permitAll()
-
 
 
     //protected void configure(HttpSecurity http) throws Exception {
@@ -60,14 +90,35 @@ public class SecurityConfiguration {
     //.antMatchers(HttpMethod.POST, "/spittles").hasAuthority("ROLE_SPITTER").authenticated()
     //.antMatchers(HttpMethod.POST, "/spittles").hasRole("SPITTER")
     //.antMatchers("/spitter/me").access("hasRole('ROLE_SPITTER')")
+    //.antMatchers("/spitter/me").access("hasRole('ROLE_SPITTER') and hasIpAddress('192.168.1.2')")
     //.anyRequest().permitAll();
 
+
+    //.antMatchers("/").requiresInecure(); ==> http
+    //.requiresChannel()  ==> https
 //    .antMatchers("/spitters/**").authenticated();
 //    .antMatchers("/spitters/**", "/spittles/mine").authenticated();
 /*
+
+
+
+
     //1=> Working with an in-memory user store
     @Bean
     public UserDetailsService userDetailsService() {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build());
+        return manager;
+
+
+    ///////////////////////////////////////////////////////////////
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+		manager.createUser(User.withDefaultPasswordEncoder()
+				.username("user")
+				.password("password")
+				.roles("USER").build());
+    }
+    ///////////////////////////////////////////////////////////////
 //UserDetailsManagerConfigurer.UserDetailsBuilder.
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();//BCryptPasswordEncoder, NoOpPasswordEncoder, andStandardPasswordEncoder.
         List<UserDetails> userDetails = new ArrayList<>();
